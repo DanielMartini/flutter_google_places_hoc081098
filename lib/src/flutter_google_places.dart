@@ -24,6 +24,11 @@ class PlacesAutocompleteWidget extends StatefulWidget {
   /// Default is 'Search'.
   final String? hint;
 
+  final Color? fillColor;
+  final InputBorder? enabledBorder;
+  final OutlineInputBorder? focusedBorder;
+  final Color? focusColor;
+
   /// The initial text to show in the search field.
   final String? startText;
 
@@ -355,6 +360,9 @@ class _PlacesAutocompleteOverlayState extends PlacesAutocompleteState {
                 fontSize: 16.0),
         decoration: InputDecoration(
           hintText: widget.hint,
+          fillColor: widget.fillColor,
+          filled: true,
+          isDense: true,
           hintStyle: TextStyle(
             color: Theme.of(context).brightness == Brightness.light
                 ? Colors.black45
@@ -362,6 +370,9 @@ class _PlacesAutocompleteOverlayState extends PlacesAutocompleteState {
             fontSize: 16.0,
           ),
           border: InputBorder.none,
+          enabledBorder: widget.enabledBorder ?? null,
+          focusedBorder: widget.focusedBorder ?? null,
+          focusColor: widget.focusColor ?? null,
         ),
       );
 }
