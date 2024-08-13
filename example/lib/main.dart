@@ -7,7 +7,7 @@ import 'package:google_api_headers/google_api_headers.dart';
 
 import 'custom.dart';
 
-const kGoogleApiKey = 'API_KEY';
+const kGoogleApiKey = 'AIzaSyDBL_l2Ex9_LLwtCy17GNJ2jfU7DnU4PiY';
 
 void main() => runApp(const RoutesWidget());
 
@@ -28,7 +28,7 @@ final customTheme = ThemeData(
       horizontal: 10.00,
     ),
   ),
-  useMaterial3: true,
+  useMaterial3: false,
 );
 
 class RoutesWidget extends StatelessWidget {
@@ -126,6 +126,7 @@ class _MyAppState extends State<MyApp> {
       language: 'fr',
       components: [const Component(Component.country, 'fr')],
       resultTextStyle: Theme.of(context).textTheme.titleMedium,
+      logo: const SizedBox()
     );
     if (!mounted) {
       return;

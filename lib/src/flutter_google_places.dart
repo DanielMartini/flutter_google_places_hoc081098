@@ -24,10 +24,12 @@ class PlacesAutocompleteWidget extends StatefulWidget {
   /// Default is 'Search'.
   final String? hint;
 
+  final Color? barColor;
   final Color? fillColor;
   final InputBorder? enabledBorder;
   final OutlineInputBorder? focusedBorder;
   final Color? focusColor;
+  final Color? borderColor;
 
   /// The initial text to show in the search field.
   final String? startText;
@@ -191,6 +193,8 @@ class PlacesAutocompleteWidget extends StatefulWidget {
       this.textStyle,
       this.cursorColor,
       this.resultTextStyle,
+      this.barColor,
+      this.borderColor,
       this.fillColor,
       this.enabledBorder,
       this.focusedBorder,
@@ -226,6 +230,7 @@ class _PlacesAutocompleteScaffoldState extends PlacesAutocompleteState {
       onTap: Navigator.of(context).pop,
       logo: widget.logo,
       resultTextStyle: widget.resultTextStyle,
+      borderColor: widget.borderColor ?? Colors.transparent,
     );
     return Scaffold(appBar: appBar, body: body);
   }
@@ -243,33 +248,45 @@ class _PlacesAutocompleteOverlayState extends PlacesAutocompleteState {
         widget.overlayBorderRadius?.topRight ?? const Radius.circular(2);
 
     final header = Column(children: <Widget>[
-      Material(
-          color: theme.dialogBackgroundColor,
-          borderRadius: BorderRadius.only(
-              topLeft: headerTopLeftBorderRadius,
-              topRight: headerTopRightBorderRadius),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              IconButton(
-                padding: const EdgeInsets.all(8.0).copyWith(top: 12.0),
-                color: theme.brightness == Brightness.light
-                    ? Colors.black45
-                    : null,
-                icon: _iconBack,
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+      ClipRRect(
+        borderRadius: const BorderRadius.all(Radius.circular(6)),
+        child: Material(
+            color: widget.barColor ?? const Color(0xff141416),
+            borderRadius: BorderRadius.only(
+                topLeft: headerTopLeftBorderRadius,
+                topRight: headerTopRightBorderRadius),
+            child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(6)),
+                  border: Border.all(
+                      color: widget.borderColor ?? Colors.transparent,
+                      width: 0.8
+                  )
               ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 8.0, left: 10.0),
-                  child: _textField(context),
-                ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  IconButton(
+                    padding: const EdgeInsets.all(8.0).copyWith(top: 12.0),
+                    color: theme.brightness == Brightness.light
+                        ? Colors.black45
+                        : null,
+                    icon: _iconBack,
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 8.0, left: 10.0),
+                      child: _textField(context),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          )),
-      const Divider(),
+            )),
+      ),
+      const Divider(color: Colors.transparent,),
     ]);
 
     final bodyBottomLeftBorderRadius =
@@ -313,16 +330,25 @@ class _PlacesAutocompleteOverlayState extends PlacesAutocompleteState {
                         bottomLeft: bodyBottomLeftBorderRadius,
                         bottomRight: bodyBottomRightBorderRadius,
                       ),
-                      color: theme.dialogBackgroundColor,
+                      color: Colors.transparent,
                       child: ListBody(
                         children: response.predictions
-                            .map(
-                              (p) => PredictionTile(
-                                prediction: p,
-                                onTap: Navigator.of(context).pop,
-                                resultTextStyle: widget.resultTextStyle,
-                              ),
-                            )
+                            .asMap()
+                            .entries
+                            .map((entry) {
+                          final int idx = entry.key;
+                          final Prediction p = entry.value;
+                          final bool isLastItem = idx == response.predictions.length - 1;
+
+                          return PredictionTile(
+                            prediction: p,
+                            onTap: Navigator.of(context).pop,
+                            resultTextStyle: widget.resultTextStyle,
+                            isLastItem: isLastItem,
+                            borderColor: widget.borderColor,
+                            fillColor: widget.fillColor,
+                          );
+                        })
                             .toList(growable: false),
                       ),
                     ),
@@ -365,7 +391,7 @@ class _PlacesAutocompleteOverlayState extends PlacesAutocompleteState {
                 fontSize: 16.0),
         decoration: InputDecoration(
           hintText: widget.hint,
-          fillColor: widget.fillColor,
+          fillColor: widget.fillColor ?? const Color(0xff141416),
           filled: true,
           isDense: true,
           hintStyle: TextStyle(
@@ -398,12 +424,13 @@ class PlacesAutocompleteResult extends StatelessWidget {
   final ValueChanged<Prediction> onTap;
   final Widget? logo;
   final TextStyle? resultTextStyle;
+  final Color? borderColor;
 
   const PlacesAutocompleteResult(
       {super.key,
       required this.onTap,
       required this.logo,
-      this.resultTextStyle});
+      this.resultTextStyle, this.borderColor});
 
   @override
   Widget build(BuildContext context) {
@@ -419,7 +446,7 @@ class PlacesAutocompleteResult extends StatelessWidget {
             response.predictions.isEmpty) {
           return Stack(
             children: [
-              if (state.isSearching) _Loader(),
+              if (state.isSearching) CircularProgressIndicator(color: borderColor ?? Colors.transparent,),
               logo ?? const PoweredByGoogleImage()
             ],
           );
@@ -534,13 +561,18 @@ class PredictionsListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      children: predictions
-          .map((Prediction p) => PredictionTile(
-                prediction: p,
-                onTap: onTap,
-                resultTextStyle: resultTextStyle,
-              ))
-          .toList(growable: false),
+      children: predictions.asMap().entries.map((entry) {
+        final int idx = entry.key;
+        final Prediction p = entry.value;
+        final bool isLastItem = idx == predictions.length - 1;
+
+        return PredictionTile(
+          prediction: p,
+          onTap: onTap,
+          resultTextStyle: resultTextStyle,
+          isLastItem: isLastItem,
+        );
+      }).toList(growable: false),
     );
   }
 }
@@ -549,23 +581,51 @@ class PredictionTile extends StatelessWidget {
   final Prediction prediction;
   final ValueChanged<Prediction> onTap;
   final TextStyle? resultTextStyle;
+  final bool isLastItem;
+  final Color? borderColor;
+  final Color? fillColor;
 
-  const PredictionTile(
-      {super.key,
-      required this.prediction,
-      required this.onTap,
-      this.resultTextStyle});
+  const PredictionTile({
+    super.key,
+    required this.prediction,
+    required this.onTap,
+    this.resultTextStyle,
+    required this.isLastItem,
+    this.borderColor,
+    this.fillColor
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: const Icon(Icons.location_on),
-      title: Text(
-        prediction.description ?? '',
-        style: resultTextStyle,
+    return Container(
+      decoration: BoxDecoration(
+        color: fillColor ?? const Color(0xff141416),
+        border: Border(
+          left: BorderSide(
+            color: borderColor ?? Colors.transparent,
+            width: 0.8,
+          ),
+          right: BorderSide(
+            color: borderColor ?? Colors.transparent,
+            width: 0.8,
+          ),
+          bottom: isLastItem ? BorderSide(
+            color: borderColor ?? Colors.transparent,
+            width: 0.8,
+          ) : BorderSide.none
+        ),
+        borderRadius: isLastItem ? const BorderRadius.vertical(bottom: Radius.circular(6)) : BorderRadius.zero,
       ),
-      onTap: () => onTap(prediction),
-    );
+      child: ListTile(
+        leading: const Icon(Icons.location_on),
+        title: Text(
+          prediction.description ?? '',
+          style: resultTextStyle,
+        ),
+        onTap: () => onTap(prediction),
+      ),
+    )
+    ;
   }
 }
 
@@ -762,6 +822,7 @@ abstract class PlacesAutocomplete {
       EdgeInsets? insetPadding,
       Widget? backArrowIcon,
       TextStyle? resultTextStyle,
+      Color? barColor,
       Color? fillColor,
       InputBorder? enabledBorder,
       OutlineInputBorder? focusedBorder,
@@ -795,6 +856,7 @@ abstract class PlacesAutocomplete {
           insetPadding: insetPadding,
           backArrowIcon: backArrowIcon,
           resultTextStyle: resultTextStyle,
+            barColor: barColor,
           fillColor: fillColor,
           enabledBorder: enabledBorder,
           focusedBorder: focusedBorder,
