@@ -190,7 +190,12 @@ class PlacesAutocompleteWidget extends StatefulWidget {
       this.textDecoration,
       this.textStyle,
       this.cursorColor,
-      this.resultTextStyle}) {
+      this.resultTextStyle,
+      this.fillColor,
+      this.enabledBorder,
+      this.focusedBorder,
+      this.focusColor
+      }) {
     if (apiKey == null && proxyBaseUrl == null) {
       throw ArgumentError(
           'One of `apiKey` and `proxyBaseUrl` fields is required');
