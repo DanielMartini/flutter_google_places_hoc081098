@@ -761,7 +761,11 @@ abstract class PlacesAutocomplete {
       Color? cursorColor,
       EdgeInsets? insetPadding,
       Widget? backArrowIcon,
-      TextStyle? resultTextStyle}) {
+      TextStyle? resultTextStyle,
+      Color? fillColor,
+      InputBorder? enabledBorder,
+      OutlineInputBorder? focusedBorder,
+      Color? focusColor}) {
     PlacesAutocompleteWidget builder(BuildContext context) =>
         PlacesAutocompleteWidget(
           apiKey: apiKey,
@@ -791,7 +795,10 @@ abstract class PlacesAutocomplete {
           insetPadding: insetPadding,
           backArrowIcon: backArrowIcon,
           resultTextStyle: resultTextStyle,
-        );
+          fillColor: fillColor,
+          enabledBorder: enabledBorder,
+          focusedBorder: focusedBorder,
+          focusColor: focusColor);
 
     switch (mode) {
       case Mode.overlay:
