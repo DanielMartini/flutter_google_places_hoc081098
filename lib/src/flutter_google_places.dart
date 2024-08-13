@@ -308,9 +308,10 @@ class _PlacesAutocompleteOverlayState extends PlacesAutocompleteState {
                 final response = state.response;
 
                 if (state.isSearching) {
-                  return Stack(
-                    alignment: FractionalOffset.bottomCenter,
-                    children: <Widget>[_Loader()],
+                  return Container(
+                    margin: const EdgeInsets.only(top: 50),
+                    alignment: Alignment.topCenter,
+                    child: CircularProgressIndicator(color: widget.borderColor,),
                   );
                 } else if (state.text.isEmpty ||
                     response == null ||
@@ -857,8 +858,8 @@ abstract class PlacesAutocomplete {
           insetPadding: insetPadding,
           backArrowIcon: backArrowIcon,
           resultTextStyle: resultTextStyle,
-            barColor: barColor,
-            borderColor: borderColor,
+          barColor: barColor,
+          borderColor: borderColor,
           fillColor: fillColor,
           enabledBorder: enabledBorder,
           focusedBorder: focusedBorder,
