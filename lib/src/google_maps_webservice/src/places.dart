@@ -26,8 +26,8 @@ class GoogleMapsPlaces extends GoogleWebService {
     super.httpClient,
     super.apiHeaders,
   }) : super(
-          apiPath: _placesUrl,
-        );
+      apiPath: _placesUrl,
+    );
 
   Future<PlacesSearchResponse> searchNearbyWithRadius(
     Location location,

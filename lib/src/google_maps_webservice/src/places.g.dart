@@ -36,9 +36,9 @@ Map<String, dynamic> _$PlacesSearchResponseToJson(
 PlacesSearchResult _$PlacesSearchResultFromJson(Map<String, dynamic> json) =>
     PlacesSearchResult(
       id: json['id'] as String?,
-      reference: json['reference'] as String,
-      name: json['name'] as String,
-      placeId: json['place_id'] as String,
+      reference: json['reference'] as String?,
+      name: json['name'] as String?,
+      placeId: json['place_id'] as String?,
       formattedAddress: json['formatted_address'] as String?,
       photos: (json['photos'] as List<dynamic>?)
               ?.map((e) => Photo.fromJson(e as Map<String, dynamic>))
@@ -96,8 +96,8 @@ const _$PriceLevelEnumMap = {
 
 PlaceDetails _$PlaceDetailsFromJson(Map<String, dynamic> json) => PlaceDetails(
       adrAddress: json['adr_address'] as String?,
-      name: json['name'] as String,
-      placeId: json['place_id'] as String,
+      name: json['name'] as String?,
+      placeId: json['place_id'] as String?,
       utcOffset: json['utc_offset'] as num?,
       id: json['id'] as String?,
       internationalPhoneNumber: json['international_phone_number'] as String?,
@@ -147,7 +147,7 @@ Map<String, dynamic> _$PlaceDetailsToJson(PlaceDetails instance) =>
       'icon': instance.icon,
       'name': instance.name,
       'opening_hours': instance.openingHours?.toJson(),
-      'photos': instance.photos.map((e) => e.toJson()).toList(),
+      'photos': instance.photos?.map((e) => e.toJson()).toList(),
       'place_id': instance.placeId,
       'international_phone_number': instance.internationalPhoneNumber,
       'price_level': _$PriceLevelEnumMap[instance.priceLevel],
